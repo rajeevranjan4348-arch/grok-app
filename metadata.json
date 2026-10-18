@@ -1,0 +1,5 @@
+{
+  "name": "Grok App",
+  "description": "Desktop workbench for Grok Build CLI",
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

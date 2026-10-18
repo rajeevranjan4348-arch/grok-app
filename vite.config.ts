@@ -85,16 +85,10 @@ export default defineConfig(() => ({
   },
   clearScreen: false,
   server: {
-    port: 1421,
+    port: 3000,
     strictPort: true,
-    host: host || false,
-    hmr: host
-      ? {
-          protocol: "ws",
-          host,
-          port: 1422,
-        }
-      : undefined,
+    host: "0.0.0.0",
+    allowedHosts: true,
     watch: {
       ignored: [
         "**/src-tauri/**",
@@ -105,11 +99,10 @@ export default defineConfig(() => ({
     },
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: vendorManualChunk,
-      },
-    },
+    target: "es2022",
+    minify: false,
+    sourcemap: false,
+    chunkSizeWarningLimit: 10000,
   },
   test: {
     environment: "node",
