@@ -25,6 +25,8 @@ mod agent_memory_embed;
 
 mod agent_prefs;
 
+mod agent_proc_home;
+
 mod agent_privacy;
 
 mod agent_subagent_wt_snap;
@@ -63,6 +65,10 @@ mod cli_worktrees;
 
 mod customize_commands;
 
+/// Prompts the Host injected into a chat (wakes / external sends): remembered so
+/// the transcript can show them as automatic follow-ups, not user messages.
+mod injected_prompts;
+
 mod wsl_backend;
 
 mod ssh_remote;
@@ -75,6 +81,7 @@ mod command_registry;
 
 mod commands;
 
+mod pet_quick;
 mod pet_window;
 mod theme_editor_window;
 
@@ -150,6 +157,10 @@ mod providers;
 mod proxy;
 
 mod relay_stream_proxy;
+
+mod pr_monitor;
+
+mod pr_monitor_i18n;
 
 mod pty_host;
 
@@ -383,6 +394,7 @@ pub fn run() {
         // AppSettings.launch_at_login in setup + settings_set. Safe for `cargo test`
         // (tests never call run(); init does not touch the OS login list).
         .plugin(tauri_plugin_autostart::Builder::new().build())
+        .plugin(pet_quick::global_shortcut_plugin())
         // Remember main window size / position / maximize across launches.
         // Desktop-only dependency (see Cargo.toml target cfg).
         .plugin({
@@ -542,6 +554,9 @@ pub fn run() {
         })
 
         .setup(|app| {
+            // Plugin setup already exited any second process. Sweep only here,
+            // so a relaunch cannot delete the running chats' agent-proc homes.
+            agent_proc_home::sweep_orphans();
 
             crate::path_scope::refresh_from_store();
 
@@ -937,6 +952,11 @@ pub fn run() {
                 } else {
                     automation_runner::start(app.handle().clone(), mgr);
                 }
+
+                // PR monitors: poll mounted PRs while the process lives (tray
+                // included) and emit `pr-monitor://update` on real changes.
+                // Mounts are UI-driven and not persisted.
+                pr_monitor::start(app.handle().clone());
             }
 
             // LaunchAgent / helper / oneshot: open into tray so schedules fire without focus steal.
@@ -1031,6 +1051,8 @@ pub fn run() {
                 }
 
             }
+
+            pet_quick::init_hotkey(app.handle());
 
             let pet_prefs = pet_window::load_prefs();
             if pet_prefs.enabled && pet_prefs.visible {

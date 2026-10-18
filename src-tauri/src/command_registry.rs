@@ -4,9 +4,10 @@
 //! new `// ── Domain ──` section rather than appending at a random spot.
 
 use crate::{
-    cli_worktrees, commands, desktop_notify, git_pr_hub, leader, mirror, os_theme, pet_window,
-    remote_im, serve, session_api, ssh_remote, system_fonts, theme_editor_window, tray, updater,
-    voice_host, wallpaper_grok_album, wallpaper_remote_commands,
+    cli_worktrees, commands, desktop_notify, git_pr_hub, leader, mirror, os_theme, pet_quick,
+    pet_window, pr_monitor, remote_im, serve, session_api, ssh_remote, system_fonts,
+    theme_editor_window, tray, updater, voice_host, wallpaper_grok_album,
+    wallpaper_remote_commands, window_min,
 };
 
 /// Single invoke handler consumed by `Builder::invoke_handler` in `run()`.
@@ -28,6 +29,7 @@ pub fn app_invoke_handler(
         session_api::session_api_reveal_cli_link,
         commands::session_interject,
         commands::session_stop,
+        commands::session_stop_report,
         commands::session_disconnect,
         commands::session_reattach,
         commands::session_resolve_permission,
@@ -166,6 +168,8 @@ pub fn app_invoke_handler(
         commands::codebase_indexing_set,
         // ── Session model, rewind & fork ──
         commands::session_set_model,
+        commands::session_set_context_window,
+        commands::session_context_info,
         commands::session_rewind_drop_last_user,
         commands::session_rewind_points,
         commands::session_rewind_execute,
@@ -297,6 +301,9 @@ pub fn app_invoke_handler(
         git_pr_hub::git_pr_view,
         git_pr_hub::git_pr_checks,
         git_pr_hub::git_pr_comments,
+        pr_monitor::pr_monitor_watch,
+        pr_monitor::pr_monitor_unwatch,
+        pr_monitor::pr_monitor_state,
         cli_worktrees::cli_worktrees_list,
         cli_worktrees::cli_worktree_db_path,
         cli_worktrees::cli_worktree_db_stats,
@@ -499,6 +506,8 @@ pub fn app_invoke_handler(
         commands::side_browser_eval,
         commands::side_browser_snapshot,
         commands::side_browser_install_download_hook,
+        // ── Main window chrome ──
+        window_min::main_hidden_menu_px,
         // ── Desktop pet ──
         pet_window::pet_prefs_get,
         pet_window::pet_prefs_set,
@@ -521,5 +530,14 @@ pub fn app_invoke_handler(
         pet_window::pet_push_tasks,
         pet_window::pet_get_tasks,
         pet_window::pet_set_hit_chrome,
+        // ── Pet quick bar ──
+        pet_quick::pet_quick_recent,
+        pet_quick::pet_quick_show,
+        pet_quick::pet_quick_hide,
+        pet_quick::pet_quick_toggle,
+        pet_quick::pet_quick_send,
+        pet_quick::pet_quick_action,
+        pet_quick::pet_quick_hotkey_get,
+        pet_quick::pet_quick_hotkey_set,
     ]
 }
