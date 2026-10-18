@@ -19,9 +19,32 @@
   animation: grok-pane-enter 160ms cubic-bezier(0.2, 0, 0, 1) both;
 }
 
+/*
+ * Small, compositor-friendly interaction transitions.
+ * Avoid "transition: all": it can animate layout-affecting properties and
+ * make large workbench surfaces feel sluggish while streaming or scrolling.
+ */
+:where(button, [role="button"], a, input, textarea, [role="tab"]) {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:where(button:not(:disabled), [role="button"]:not([aria-disabled="true"])):active {
+  transform: scale(0.985);
+}
+
+:where(button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [role="tab"]:focus-visible) {
+  transition-duration: 100ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .auto-page,
   .settings-page {
     animation: none;
+  }
+
+  :where(button, [role="button"], a, input, textarea, [role="tab"]) {
+    transition-duration: 0ms;
   }
 }
